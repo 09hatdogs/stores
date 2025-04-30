@@ -1,0 +1,855 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sari-Sari Store Online</title>
+    <style>
+        /* Reset and Base Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: rgb(255, 248, 240);
+            color: #333;
+        }
+        
+        /* Header Styles */
+        header {
+            background-color: #4a6741;
+            color: white;
+            padding: 1rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .header-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+        
+        .nav-links {
+            display: flex;
+            gap: 1.5rem;
+        }
+        
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+        
+        .nav-links a:hover {
+            color: #ffd166;
+        }
+        
+        .cart-icon {
+            position: relative;
+            cursor: pointer;
+        }
+        
+        .cart-count {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background-color: #ffd166;
+            color: #333;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            font-weight: bold;
+        }
+        
+        /* Main Content Styles */
+        main {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+        
+        .banner {
+            background-image: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.3)), url('/api/placeholder/1200/400');
+            background-size: cover;
+            background-position: center;
+            height: 300px;
+            border-radius: 8px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        
+        .banner h1 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+        }
+        
+        .banner p {
+            font-size: 1.2rem;
+            max-width: 600px;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+        }
+        
+        .categories {
+            display: flex;
+            gap: 1rem;
+            overflow-x: auto;
+            padding-bottom: 1rem;
+            margin-bottom: 2rem;
+        }
+        
+        .category {
+            background-color: #4a6741;
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            cursor: pointer;
+            white-space: nowrap;
+            transition: background-color 0.3s;
+        }
+        
+        .category:hover, .category.active {
+            background-color: #ffd166;
+            color: #333;
+        }
+        
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+        
+        .product-card {
+            background-color: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        
+        .product-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        .product-image {
+            width: 100%;
+            height: 150px;
+            object-fit: cover;
+        }
+        
+        .product-info {
+            padding: 1rem;
+        }
+        
+        .product-title {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+        
+        .product-price {
+            color: #4a6741;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+        
+        .add-to-cart {
+            background-color: #ffd166;
+            color: #333;
+            border: none;
+            padding: 0.5rem;
+            border-radius: 4px;
+            cursor: pointer;
+            width: 100%;
+            font-weight: 600;
+            transition: background-color 0.3s;
+        }
+        
+        .add-to-cart:hover {
+            background-color: #e6bc5c;
+        }
+        
+        /* Cart Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .modal-content {
+            background-color: white;
+            width: 90%;
+            max-width: 600px;
+            border-radius: 8px;
+            overflow: hidden;
+            max-height: 90vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .modal-header {
+            background-color: #4a6741;
+            color: white;
+            padding: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .close-modal {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+        
+        .modal-body {
+            padding: 1rem;
+            overflow-y: auto;
+            flex-grow: 1;
+        }
+        
+        .cart-item {
+            display: flex;
+            margin-bottom: 1rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .cart-item-image {
+            width: 80px;
+            height: 80px;
+            object-fit: cover;
+            border-radius: 4px;
+            margin-right: 1rem;
+        }
+        
+        .cart-item-details {
+            flex-grow: 1;
+        }
+        
+        .cart-item-title {
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+        
+        .cart-item-price {
+            color: #4a6741;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+        
+        .quantity-controls {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .quantity-btn {
+            background-color: #eee;
+            border: none;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .cart-item-remove {
+            color: #e74c3c;
+            background: none;
+            border: none;
+            cursor: pointer;
+            margin-left: auto;
+            align-self: flex-start;
+        }
+        
+        .cart-total {
+            font-weight: bold;
+            font-size: 1.2rem;
+            margin: 1rem 0;
+            text-align: right;
+        }
+        
+        .checkout-btn {
+            background-color: #4a6741;
+            color: white;
+            border: none;
+            padding: 0.75rem;
+            border-radius: 4px;
+            cursor: pointer;
+            width: 100%;
+            font-weight: 600;
+            transition: background-color 0.3s;
+        }
+        
+        .checkout-btn:hover {
+            background-color: #3d5635;
+        }
+        
+        /* Checkout Form */
+        .checkout-form {
+            display: none;
+        }
+        
+        .form-group {
+            margin-bottom: 1rem;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+        
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        
+        .payment-options {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+        
+        .payment-option {
+            flex-grow: 1;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 1rem;
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.3s;
+        }
+        
+        .payment-option:hover, .payment-option.selected {
+            border-color: #4a6741;
+            background-color: #f1f7f0;
+        }
+        
+        .payment-logo {
+            width: 60px;
+            height: 40px;
+            object-fit: contain;
+            margin-bottom: 0.5rem;
+        }
+        
+        .back-to-cart {
+            margin-right: 0.5rem;
+            background-color: #eee;
+            color: #333;
+            border: none;
+            padding: 0.75rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+        
+        /* Order Confirmation */
+        .order-confirmation {
+            display: none;
+            text-align: center;
+            padding: 2rem;
+        }
+        
+        .order-confirmation i {
+            font-size: 3rem;
+            color: #4a6741;
+            margin-bottom: 1rem;
+        }
+        
+        .order-confirmation h3 {
+            margin-bottom: 1rem;
+        }
+        
+        .order-id {
+            background-color: #f1f7f0;
+            padding: 0.5rem;
+            border-radius: 4px;
+            font-family: monospace;
+            margin-bottom: 1rem;
+        }
+        
+        /* Responsive styles */
+        @media (max-width: 768px) {
+            .banner h1 {
+                font-size: 2rem;
+            }
+            
+            .banner p {
+                font-size: 1rem;
+            }
+            
+            .products-grid {
+                grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            }
+            
+            .payment-options {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header with navigation -->
+    <header>
+        <div class="header-container">
+            <div class="logo">Sari-Sari Store</div>
+            <div class="nav-links">
+                <a href="#home">Home</a>
+                <a href="#products">Products</a>
+                <a href="#about">About Us</a>
+                <div class="cart-icon" onclick="openCart()">
+                    🛒 <span class="cart-count">0</span>
+                </div>
+            </div>
+        </div>
+    </header>
+    
+    <!-- Main Content -->
+    <main>
+        <!-- Banner -->
+        <div class="banner">
+            <h1>Welcome to Sari-Sari Store Online</h1>
+            <p>Your neighborhood convenience store now available online!</p>
+        </div>
+        
+        <!-- Categories -->
+        <div class="categories">
+            <div class="category active" onclick="filterProducts('all')">All Products</div>
+            <div class="category" onclick="filterProducts('canned')">Canned Goods</div>
+            <div class="category" onclick="filterProducts('snacks')">Snacks</div>
+            <div class="category" onclick="filterProducts('drinks')">Beverages</div>
+            <div class="category" onclick="filterProducts('household')">Household</div>
+            <div class="category" onclick="filterProducts('personal')">Personal Care</div>
+        </div>
+        
+        <!-- Products Grid -->
+        <div class="products-grid" id="products-container">
+            <!-- Products will be dynamically added here using JavaScript -->
+        </div>
+    </main>
+    
+    <!-- Cart Modal -->
+    <div class="modal" id="cart-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Your Cart</h2>
+                <button class="close-modal" onclick="closeCart()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div id="cart-items-container">
+                    <!-- Cart items will be added here -->
+                </div>
+                <div class="cart-total" id="cart-total">Total: ₱0.00</div>
+                <button class="checkout-btn" id="proceed-to-checkout" onclick="showCheckoutForm()">Proceed to Checkout</button>
+                
+                <!-- Checkout Form -->
+                <div class="checkout-form" id="checkout-form">
+                    <h3>Checkout Information</h3>
+                    <div class="form-group">
+                        <label for="name">Full Name</label>
+                        <input type="text" id="name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="phone">Phone Number</label>
+                        <input type="tel" id="phone" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="address">Delivery Address</label>
+                        <input type="text" id="address" required>
+                    </div>
+                    
+                    <h3>Payment Method</h3>
+                    <div class="payment-options">
+                        <div class="payment-option" onclick="selectPayment('gcash')">
+                            <img src="gcash.png" alt="GCash" class="payment-logo">
+                            <div>GCash</div>
+                        </div>
+                        <div class="payment-option" onclick="selectPayment('paymaya')">
+                            <img src="maya.jpg" alt="PayMaya" class="payment-logo">
+                            <div>PayMaya</div>
+                        </div>
+                        <div class="payment-option" onclick="selectPayment('cash')">
+                            <img src="COD.jpg" alt="Cash" class="payment-logo">
+                            <div>Cash on Delivery</div>
+                        </div>
+                    </div>
+                    
+                    <div id="payment-gcash" class="payment-details" style="display: none;">
+                        <div class="form-group">
+                            <label for="gcash-number">GCash Number</label>
+                            <input type="tel" id="gcash-number">
+                        </div>
+                    </div>
+                    
+                    <div id="payment-paymaya" class="payment-details" style="display: none;">
+                        <div class="form-group">
+                            <label for="paymaya-number">PayMaya Number</label>
+                            <input type="tel" id="paymaya-number">
+                        </div>
+                    </div>
+                    
+                    <div class="form-group" style="display: flex; justify-content: flex-end; margin-top: 1rem;">
+                        <button class="back-to-cart" onclick="backToCart()">Back to Cart</button>
+                        <button class="checkout-btn" onclick="completeOrder()">Complete Order</button>
+                    </div>
+                </div>
+                
+                <!-- Order Confirmation -->
+                <div class="order-confirmation" id="order-confirmation">
+                    <i>✓</i>
+                    <h3>Order Placed Successfully!</h3>
+                    <p>Your order has been received and is being processed.</p>
+                    <div class="order-id">Order ID: SS-2025429-001</div>
+                    <p>We'll contact you shortly with delivery details.</p>
+                    <button class="checkout-btn" onclick="closeCart()">Continue Shopping</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Sample product data
+        const products = [
+            {
+                id: 1,
+                name: "Sardines",
+                price: 22.50,
+                category: "canned",
+                image: "sardinas.jpg"
+            },
+            {
+                id: 2,
+                name: "Corned Beef",
+                price: 45.75,
+                category: "canned",
+                image: "kornbip.jpg"
+            },
+            {
+                id: 3,
+                name: "Instant Noodles",
+                price: 15.00,
+                category: "canned",
+                image: "instantnoodles.jpg"
+            },
+            {
+                id: 4,
+                name: "Potato Chips",
+                price: 25.00,
+                category: "snacks",
+                image: "chips.jpg"
+            },
+            {
+                id: 5,
+                name: "Chocolate Bar",
+                price: 35.50,
+                category: "snacks",
+                image: "chocolates.jpg"
+            },
+            {
+                id: 6,
+                name: "Soda (330ml)",
+                price: 20.00,
+                category: "drinks",
+                image: "sopdrink.jpg"
+            },
+            {
+                id: 7,
+                name: "Bottled Water",
+                price: 15.00,
+                category: "drinks",
+                image: "bote.jpg"
+            },
+            {
+                id: 8,
+                name: "Coffee Sachets",
+                price: 8.50,
+                category: "drinks",
+                image: "kape.jpg"
+            },
+            {
+                id: 9,
+                name: "Dish Soap",
+                price: 32.75,
+                category: "household",
+                image: "dishsopa.jpg"
+            },
+            {
+                id: 10,
+                name: "Laundry Detergent",
+                price: 55.00,
+                category: "household",
+                image: "laundry.jpg"
+            },
+            {
+                id: 11,
+                name: "Shampoo Sachet",
+                price: 12.00,
+                category: "personal",
+                image: "shampoo.jpg"
+            },
+            {
+                id: 12,
+                name: "Toothpaste",
+                price: 45.50,
+                category: "personal",
+                image: "toothpaste.jpg"
+            }
+        ];
+        
+        // Cart array to store items
+        let cart = [];
+        let selectedPaymentMethod = '';
+        
+        // Initialize the page
+        document.addEventListener('DOMContentLoaded', function() {
+            displayProducts('all');
+        });
+        
+        // Display products based on category
+        function displayProducts(category) {
+            const productsContainer = document.getElementById('products-container');
+            productsContainer.innerHTML = '';
+            
+            const filteredProducts = category === 'all' 
+                ? products 
+                : products.filter(product => product.category === category);
+            
+            filteredProducts.forEach(product => {
+                const productCard = document.createElement('div');
+                productCard.className = 'product-card';
+                productCard.innerHTML = `
+                    <img src="${product.image}" alt="${product.name}" class="product-image">
+                    <div class="product-info">
+                        <div class="product-title">${product.name}</div>
+                        <div class="product-price">₱${product.price.toFixed(2)}</div>
+                        <button class="add-to-cart" onclick="addToCart(${product.id})">Add to Cart</button>
+                    </div>
+                `;
+                productsContainer.appendChild(productCard);
+            });
+        }
+        
+        // Filter products by category
+        function filterProducts(category) {
+            // Update active category
+            document.querySelectorAll('.category').forEach(cat => {
+                cat.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            displayProducts(category);
+        }
+        
+        // Add product to cart
+        function addToCart(productId) {
+            const product = products.find(p => p.id === productId);
+            if (!product) return;
+            
+            const existingItem = cart.find(item => item.id === productId);
+            
+            if (existingItem) {
+                existingItem.quantity++;
+            } else {
+                cart.push({
+                    ...product,
+                    quantity: 1
+                });
+            }
+            
+            updateCartCount();
+        }
+        
+        // Update cart item count
+        function updateCartCount() {
+            const cartCount = document.querySelector('.cart-count');
+            const totalItems = cart.reduce((total, item) => total + item.quantity, 0);
+            cartCount.textContent = totalItems;
+        }
+        
+        // Open cart modal
+        function openCart() {
+            renderCartItems();
+            document.getElementById('cart-modal').style.display = 'flex';
+            document.getElementById('cart-items-container').style.display = 'block';
+            document.getElementById('checkout-form').style.display = 'none';
+            document.getElementById('order-confirmation').style.display = 'none';
+            document.getElementById('proceed-to-checkout').style.display = 'block';
+        }
+        
+        // Close cart modal
+        function closeCart() {
+            document.getElementById('cart-modal').style.display = 'none';
+        }
+        
+        // Render cart items
+        function renderCartItems() {
+            const cartContainer = document.getElementById('cart-items-container');
+            cartContainer.innerHTML = '';
+            
+            if (cart.length === 0) {
+                cartContainer.innerHTML = '<p>Your cart is empty.</p>';
+                document.getElementById('proceed-to-checkout').disabled = true;
+                document.getElementById('cart-total').textContent = 'Total: ₱0.00';
+                return;
+            }
+            
+            document.getElementById('proceed-to-checkout').disabled = false;
+            
+            let total = 0;
+            
+            cart.forEach(item => {
+                const itemTotal = item.price * item.quantity;
+                total += itemTotal;
+                
+                const cartItem = document.createElement('div');
+                cartItem.className = 'cart-item';
+                cartItem.innerHTML = `
+                    <img src="${item.image}" alt="${item.name}" class="cart-item-image">
+                    <div class="cart-item-details">
+                        <div class="cart-item-title">${item.name}</div>
+                        <div class="cart-item-price">₱${item.price.toFixed(2)}</div>
+                        <div class="quantity-controls">
+                            <button class="quantity-btn" onclick="decreaseQuantity(${item.id})">-</button>
+                            <span>${item.quantity}</span>
+                            <button class="quantity-btn" onclick="increaseQuantity(${item.id})">+</button>
+                        </div>
+                    </div>
+                    <button class="cart-item-remove" onclick="removeFromCart(${item.id})">✖</button>
+                `;
+                
+                cartContainer.appendChild(cartItem);
+            });
+            
+            document.getElementById('cart-total').textContent = `Total: ₱${total.toFixed(2)}`;
+        }
+        
+        // Increase item quantity
+        function increaseQuantity(productId) {
+            const item = cart.find(item => item.id === productId);
+            if (item) {
+                item.quantity++;
+                renderCartItems();
+                updateCartCount();
+            }
+        }
+        
+        // Decrease item quantity
+        function decreaseQuantity(productId) {
+            const item = cart.find(item => item.id === productId);
+            if (item) {
+                item.quantity--;
+                if (item.quantity <= 0) {
+                    removeFromCart(productId);
+                } else {
+                    renderCartItems();
+                    updateCartCount();
+                }
+            }
+        }
+        
+        // Remove item from cart
+        function removeFromCart(productId) {
+            cart = cart.filter(item => item.id !== productId);
+            renderCartItems();
+            updateCartCount();
+        }
+        
+        // Show checkout form
+        function showCheckoutForm() {
+            if (cart.length === 0) return;
+            
+            document.getElementById('cart-items-container').style.display = 'none';
+            document.getElementById('checkout-form').style.display = 'block';
+            document.getElementById('proceed-to-checkout').style.display = 'none';
+        }
+        
+        // Back to cart
+        function backToCart() {
+            document.getElementById('cart-items-container').style.display = 'block';
+            document.getElementById('checkout-form').style.display = 'none';
+            document.getElementById('proceed-to-checkout').style.display = 'block';
+        }
+        
+        // Select payment method
+        function selectPayment(method) {
+            selectedPaymentMethod = method;
+            
+            // Reset all payment options
+            document.querySelectorAll('.payment-option').forEach(option => {
+                option.classList.remove('selected');
+            });
+            
+            // Hide all payment details
+            document.querySelectorAll('.payment-details').forEach(detail => {
+                detail.style.display = 'none';
+            });
+            
+            // Select the clicked option
+            event.target.closest('.payment-option').classList.add('selected');
+            
+            // Show additional fields if needed
+            if (method !== 'cash') {
+                document.getElementById(`payment-${method}`).style.display = 'block';
+            }
+        }
+        
+        // Complete order
+        function completeOrder() {
+            // Validate form
+            const name = document.getElementById('name').value;
+            const phone = document.getElementById('phone').value;
+            const address = document.getElementById('address').value;
+            
+            if (!name || !phone || !address || !selectedPaymentMethod) {
+                alert('Please fill in all required fields and select a payment method.');
+                return;
+            }
+            
+            // Process payment (in a real app, this would connect to payment gateways)
+            
+            // Show confirmation
+            document.getElementById('checkout-form').style.display = 'none';
+            document.getElementById('order-confirmation').style.display = 'block';
+            
+            // Clear cart
+            cart = [];
+            updateCartCount();
+        }
+    </script>
+</body>
+</html>
